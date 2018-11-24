@@ -9,8 +9,8 @@ module.exports = {
     rsktestnet: {
       provider: function() {
         return new HDWalletProvider(process.env.MNEMONIC.trim(), process.env.RSK_NODE, 0, 1, false, rskTestnetDerivation)
-
       },
+      gasPrice: 1,
       network_id: '31'
     }
   }

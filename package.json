@@ -1,6 +1,6 @@
 {
   "name": "@lncm/supercavitation-contracts",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "directories": {
     "test": "test"
@@ -11,7 +11,9 @@
     "truffle-hdwallet-provider": "git://github.com/trufflesuite/truffle-hdwallet-provider.git#a6f5524fbc8c973df7828bda59c61c47e51a3bec"
   },
   "scripts": {
-    "start": "truffle console --network rsktestnet"
+    "start": "truffle console --network rsktestnet",
+    "migrate": "truffle migrate --network rsktestnet --verbose-rpc --reset",
+    "build": "truffle compile --all"
   },
   "author": "",
   "license": "ISC"
