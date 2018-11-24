@@ -48,7 +48,7 @@ contract SwapOffering {
     emit contractWithdrawn(address(this).balance);
   }
 
-  function getSwap(bytes32 preImageHash) public constant returns (
+  function getSwap(bytes32 preImageHash) public view returns (
     address customer, uint256 amount, uint256 reward, uint256 cancelBlockHeight, SwapState state) {
 
     Swap storage swap = swaps[preImageHash];
@@ -71,6 +71,8 @@ contract SwapOffering {
     swap.preImageHash = preImageHash;
     swap.cancelBlockHeight =  blocksBeforeCancelEnabled.add(block.number);
     swap.state = SwapState.Created;
+
+    // TODO some gas to alice
 
     lockedFunds = lockedFunds.add(amount).add(reward);
 
