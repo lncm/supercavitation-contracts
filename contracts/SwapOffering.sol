@@ -7,7 +7,7 @@ contract SwapOffering {
   using SafeMath for uint256;
 
   address public owner;
-  string public httpEndpoint;
+  string public url;
   uint256 public lockedFunds;
 
   enum SwapState { Created, Completed, Canceled }
@@ -23,42 +23,47 @@ contract SwapOffering {
 
   mapping(bytes32 => Swap) public swaps;
 
-  event contractFunded();
-  event contractWithdrawn();
+  event contractFunded(uint256 fundAmount);
+  event contractWithdrawn(uint256 balance);
 
   event swapCreated(bytes32 preImageHash);
   event swapCompleted(bytes32 preImageHash);
   event swapCanceled(bytes32 preImageHash);
 
-  constructor(string _httpEndpoint) public payable {
-    owner = msg.sender;
-
-    httpEndpoint = _httpEndpoint;
+  constructor(string _url, address _owner) public {
+    owner = _owner;
+    url = _url;
   }
 
   function fundContract() public payable {
-
-    // TODO
-
-    emit contractFunded();
+    emit contractFunded(msg.value);
   }
 
-  function withdrawFunds() public {
+  function withdrawAvailableFunds() public {
 
-    // TODO
+    require(msg.sender == owner, "Only owner can withdraw the funds.");
 
-    emit contractWithdrawn();
+    owner.transfer(address(this).balance.sub(lockedFunds));
+
+    emit contractWithdrawn(address(this).balance);
+  }
+
+  function getSwap(bytes32 preImageHash) public constant returns (
+    address customer, uint256 amount, uint256 reward, uint256 cancelBlockHeight, SwapState state) {
+
+    Swap storage swap = swaps[preImageHash];
+
+    return (swap.customer, swap.amount, swap.reward, swap.cancelBlockHeight, swap.state);
   }
 
   function createSwap(address customer, uint256 amount, uint256 reward, bytes32 preImageHash, uint256 blocksBeforeCancelEnabled) public {
     Swap storage swap = swaps[preImageHash];
 
     require(swap.amount == 0, "Swap already exists.");
-    require(swap.amount > 0, "Swap amount must be greater that 0.");
+    require(amount > 0, "Swap amount must be greater that 0.");
+    require(blocksBeforeCancelEnabled > 0, "blocksBeforeCancelEnabled must be greater that 0.");
     require(msg.sender == owner, "Only owner can create the swap.");
-    require(amount <= owner.balance.sub(lockedFunds), "Amount is greater than availble funds.");
-
-    // TODO
+    require(amount <= address(this).balance.sub(lockedFunds), "Amount is greater than availble funds.");
 
     swap.customer = customer;
     swap.amount = amount;
@@ -78,12 +83,13 @@ contract SwapOffering {
     require(sha256(abi.encodePacked(preImage)) == preImageHash, "Incorrect preImage.");
     require(swap.state == SwapState.Created, "Incorrect state. Order can not be completed.");
 
-    msg.sender.transfer(swap.reward);
-    swap.customer.transfer(swap.amount);
-
     swap.state = SwapState.Completed;
-
     lockedFunds = lockedFunds.sub(swap.amount).sub(swap.reward);
+
+    if (swap.reward > 0) {
+      msg.sender.transfer(swap.reward);
+    }
+    swap.customer.transfer(swap.amount);
 
     emit swapCompleted(preImageHash);
   }
@@ -96,7 +102,6 @@ contract SwapOffering {
     require(swap.state == SwapState.Created, "Incorrect state. Order can not be Canceled.");
 
     swap.state = SwapState.Canceled;
-
     lockedFunds = lockedFunds.sub(swap.amount).sub(swap.reward);
 
     emit swapCanceled(preImageHash);
