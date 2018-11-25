@@ -16,6 +16,7 @@ contract SwapOffering {
     address customer;
     bytes32 preImageHash;
     uint256 amount;
+    uint256 depositAmount;
     uint256 reward;
     uint256 cancelBlockHeight;
     SwapState state;
@@ -48,7 +49,7 @@ contract SwapOffering {
     emit contractWithdrawn(address(this).balance);
   }
 
-  function getSwap(bytes32 preImageHash) public view returns (
+  function getSwap(bytes32 preImageHash) public constant returns (
     address customer, uint256 amount, uint256 reward, uint256 cancelBlockHeight, SwapState state) {
 
     Swap storage swap = swaps[preImageHash];
@@ -56,25 +57,25 @@ contract SwapOffering {
     return (swap.customer, swap.amount, swap.reward, swap.cancelBlockHeight, swap.state);
   }
 
-  function createSwap(address customer, uint256 amount, uint256 reward, bytes32 preImageHash, uint256 blocksBeforeCancelEnabled) public {
+  function createSwap(address customer, uint256 amount, uint256 reward, bytes32 preImageHash, uint256 blocksBeforeCancelEnabled, uint256 depositAmount) public {
     Swap storage swap = swaps[preImageHash];
 
     require(swap.amount == 0, "Swap already exists.");
     require(amount > 0, "Swap amount must be greater that 0.");
     require(blocksBeforeCancelEnabled > 0, "blocksBeforeCancelEnabled must be greater that 0.");
     require(msg.sender == owner, "Only owner can create the swap.");
-    require(amount <= address(this).balance.sub(lockedFunds), "Amount is greater than availble funds.");
+    require(amount.add(depositAmount) <= address(this).balance.sub(lockedFunds), "Amount is greater than availble funds.");
 
     swap.customer = customer;
     swap.amount = amount;
+    swap.depositAmount = depositAmount;
     swap.reward = reward;
     swap.preImageHash = preImageHash;
     swap.cancelBlockHeight =  blocksBeforeCancelEnabled.add(block.number);
     swap.state = SwapState.Created;
 
-    // TODO some gas to alice
-
     lockedFunds = lockedFunds.add(amount).add(reward);
+    swap.customer.transfer(swap.depositAmount);
 
     emit swapCreated(preImageHash);
   }
