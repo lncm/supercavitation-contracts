@@ -85,6 +85,7 @@ contract SwapOffering {
 
     require(sha256(abi.encodePacked(preImage)) == preImageHash, "Incorrect preImage.");
     require(swap.state == SwapState.Created, "Incorrect state. Order can not be completed.");
+    require(block.number < swap.cancelBlockHeight, "Swap has expired.");
 
     swap.state = SwapState.Completed;
     lockedFunds = lockedFunds.sub(swap.amount).sub(swap.reward);
