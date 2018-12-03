@@ -1,6 +1,6 @@
 {
   "name": "@lncm/supercavitation-contracts",
-  "version": "0.0.3",
+  "version": "0.2.0",
   "description": "",
   "directories": {
     "test": "test"
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "truffle console --network rsktestnet",
-    "migrate": "truffle migrate --network rsktestnet --verbose-rpc --reset",
+    "migrate": "truffle migrate --network rsktestnet --reset",
     "build": "truffle compile --all"
   },
   "author": "",
