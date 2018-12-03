@@ -16,7 +16,7 @@ contract SwapOffering {
     address customer;
     bytes32 preImageHash;
     uint256 amount;
-    uint256 depositAmount;
+    uint256 supercavitationGas;
     uint256 reward;
     uint256 cancelBlockHeight;
     SwapState state;
@@ -57,25 +57,25 @@ contract SwapOffering {
     return (swap.customer, swap.amount, swap.reward, swap.cancelBlockHeight, swap.state);
   }
 
-  function createSwap(address customer, uint256 amount, uint256 reward, bytes32 preImageHash, uint256 blocksBeforeCancelEnabled, uint256 depositAmount) public {
+  function createSwap(address customer, uint256 amount, uint256 reward, bytes32 preImageHash, uint256 blocksBeforeCancelEnabled, uint256 supercavitationGas) public {
     Swap storage swap = swaps[preImageHash];
 
     require(swap.amount == 0, "Swap already exists.");
     require(amount > 0, "Swap amount must be greater that 0.");
     require(blocksBeforeCancelEnabled > 0, "blocksBeforeCancelEnabled must be greater that 0.");
     require(msg.sender == owner, "Only owner can create the swap.");
-    require(amount.add(depositAmount) <= address(this).balance.sub(lockedFunds), "Amount is greater than availble funds.");
+    require(amount.add(supercavitationGas) <= address(this).balance.sub(lockedFunds), "Amount is greater than availble funds.");
 
     swap.customer = customer;
     swap.amount = amount;
-    swap.depositAmount = depositAmount;
+    swap.supercavitationGas = supercavitationGas;
     swap.reward = reward;
     swap.preImageHash = preImageHash;
     swap.cancelBlockHeight =  blocksBeforeCancelEnabled.add(block.number);
     swap.state = SwapState.Created;
 
     lockedFunds = lockedFunds.add(amount).add(reward);
-    swap.customer.transfer(swap.depositAmount);
+    swap.customer.transfer(swap.supercavitationGas);
 
     emit swapCreated(preImageHash);
   }
