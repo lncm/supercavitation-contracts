@@ -7,13 +7,20 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "ganache-cli": "6.2.3",
     "truffle": "4.1.14",
     "truffle-hdwallet-provider": "git://github.com/trufflesuite/truffle-hdwallet-provider.git#a6f5524fbc8c973df7828bda59c61c47e51a3bec"
   },
   "scripts": {
-    "start": "truffle console --network rsktestnet",
-    "migrate": "truffle migrate --network rsktestnet --reset",
-    "build": "truffle compile --all"
+    "compile": "truffle compile --all",
+    "creds": ". ./creds.sh",
+    "ganache:build": "npm run compile && npm run creds && npm run ganache:migrate & npm run ganache:server",
+    "ganache:console": "truffle console --network ganache",
+    "ganache:migrate": "truffle networks --clean && truffle migrate --network ganache --reset",
+    "ganache:server": "ganache-cli --account $(echo $PRIVATE_KEY),100000000000000000000",
+    "testnet:console": "truffle console --network rsktestnet",
+    "testnet:migrate": "truffle networks --clean && truffle migrate --network rsktestnet --reset",
+    "truffle": "truffle"
   },
   "author": "",
   "license": "ISC"
