@@ -13,11 +13,10 @@
   },
   "scripts": {
     "compile": "truffle compile --all",
-    "creds": ". ./creds.sh",
-    "ganache:build": "npm run compile && npm run creds && npm run ganache:migrate & npm run ganache:server",
+    "ganache:build": "npm run compile && npm run ganache:migrate & npm run ganache:server",
     "ganache:console": "truffle console --network ganache",
     "ganache:migrate": "truffle networks --clean && truffle migrate --network ganache --reset",
-    "ganache:server": "ganache-cli --account $(echo $PRIVATE_KEY),100000000000000000000",
+    "ganache:server": "ganache-cli --account $(cat ./creds/privatekey),100000000000000000000",
     "testnet:console": "truffle console --network rsktestnet",
     "testnet:migrate": "truffle networks --clean && truffle migrate --network rsktestnet --reset",
     "truffle": "truffle"
