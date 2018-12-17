@@ -1,6 +1,6 @@
 var SwapOffering = artifacts.require("SwapOffering");
 
-const url = process.env.URL || 'http://localhost:8080';
+const url = process.env.URL || 'http://localhost:8081';
 const satoshis = 1000;
 const wei = satoshis * 1e10;
 
