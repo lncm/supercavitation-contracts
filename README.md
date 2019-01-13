@@ -2,4 +2,6 @@
 
 This projects contains contracts for the [Supercavitations Swaps](https://github.com/lncm/supercavitation-swaps) service.
 
-TODO: Readme
+** TECHNICAL DEMO ONLY DO NOT USE FOR SIGNIFICANT VALUE **
+
+TODO: A Readme
